@@ -1,0 +1,79 @@
+---
+title: "vadim"
+date: "2024-01-11"
+output:
+  html_document:
+     keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Code and simulated data for the manuscript **Influence of mRNA Covid-19 vaccine dosing interval on the risk of myocarditis** by Le Vu et al.
+
+```{r}
+knitr::read_chunk("functions.R")
+```
+
+```{r libs, warning = FALSE, message = FALSE}
+
+```
+
+```{r parms}
+
+```
+
+- We are analyzing a matched case-control study with essentially two covariates, first $V$ the recent exposure to a vaccine dose (binary variable), and $X$ a continuous time interval that represents spacing between previous and current dose.
+    - While the recent exposure is a risk factor in itself, we state that the time interval only acts as a risk factor conditional on recent exposure.
+    - The hypothesis for the research question is that shorter spacing between doses increase the risk of being a case in people recently vaccinated (i.e. exposed).
+    - We will quantify the relation by either categorizing $X$ or modelling it continuously.
+ 
+## Data   
+- We start by simulating data from a matched case-control study. Parameters are set so that
+    - Study comprises `r parms[["ncase"]]` cases and `r parms[["kctl"]]` controls per case.
+    - Proportion $p_n$ of exposed among controls is `r parms[["pn"]]*100`%.
+    - True odds-ratio of being exposed is `r parms[["or"]]`, so that $P(exposed|case) = OR \times p_n =$ `r parms[["or"]] * parms[["pn"]]*100`%.
+    - Exposed cases have a shorter spacing between doses relative to controls and unexposed cases (`r parms[["mean_x_exp"]]` vs `r parms[["mean_x_unexp"]]` days).
+    
+```{r make_mcc}
+
+```
+
+
+```{r run sim}
+
+```
+
+```{r check}
+
+```
+- We can look at the contingency table (control/case by unexposed/exposed)
+```{r}
+m
+```
+- Raw OR is `r round(or, 2)`
+- And the delay distribution is shifted for exposed cases
+```{r, fig.width=5, fig.height=5}
+p0
+```
+
+- Model parameterization is either
+   - One categorical variable of exposure $E$ that combines $V$ and quantiles of $X$: "Unexposed", "Exposed and 1st quantile of x", "Exposed and 2nd... etc". So that $E$ has (1 + $k$ quantiles) categories.
+   $$logitP(Y=1) \sim \beta_0 + \beta_1 E$$
+   - One binary variable of exposure + one continuous variable for spacing + interaction term. Or $$logitP(Y=1) \sim \beta_0 + \beta_1 V + \beta_2 X + \beta_3 (V \times X)$$
+
+## Categorized $X$
+```{r quantiles}
+
+```
+- odds ratio by category
+```{r}
+res
+```
+## Continuous $X$
+- partial-effect plot 
+```{r spline, warning=FALSE, fig.width=3, fig.height=3}
+
+```
+

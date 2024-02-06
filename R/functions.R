@@ -1,44 +1,27 @@
-# vadim
+##-----------------------------------------------------------------------------
+#'
+#' vadim
+#' Stephane Le Vu
+#' Started 11/01/2024
+#'
+##-----------------------------------------------------------------------------
 
-Code and simulated data for the manuscript **Influence of mRNA Covid-19 vaccine dosing interval on the risk of myocarditis** by Le Vu et al.
-
-
-```r
-knitr::read_chunk("functions.R")
-```
-
-
-```r
+##---- libs ----
 {
   library(survival)
   library(rms)
   library(ggplot2)
 }
-```
 
 
-```r
+##---- parms ----
 parms <- list(ncase = 1000, kctl = 5,
               pn = 0.1, or = 2,
               mean_x_exp = 21,
               mean_x_unexp = 28)
 outlb <-  c(0.01, .99)
-```
 
-- We are analyzing a matched case-control study with essentially two covariates, first $V$ the recent exposure to a vaccine dose (binary variable), and $X$ a continuous time interval that represents spacing between previous and current dose.
-    - While the recent exposure is a risk factor in itself, we state that the time interval only acts as a risk factor conditional on recent exposure.
-    - The hypothesis for the research question is that shorter spacing between doses increase the risk of being a case in people recently vaccinated (i.e. exposed).
-    - We will quantify the relation by either categorizing $X$ or modelling it continuously.
- 
-## Data   
-- We start by simulating data from a matched case-control study. Parameters are set so that
-    - Study comprises 1000 cases and 5 controls per case.
-    - Proportion $p_n$ of exposed among controls is 10%.
-    - True odds-ratio of being exposed is 2, so that $P(exposed|case) = OR \times p_n =$ 20%.
-    - Exposed cases have a shorter spacing between doses relative to controls and unexposed cases (21 vs 28 days).
-    
-
-```r
+##---- make_mcc ----
 ## simulate dataset with known risk factors.
 # 1:k controls, binary exposure,
 # continuous variable (delay) that depends on binary exposure (in cases)
@@ -76,17 +59,12 @@ make_mcc <- function(
   df <- data.frame(set, y, b, x)
   df
 }
-```
 
-
-
-```r
+##---- run sim ----
 # df <- make_mcc(ncase = 1000, kctl = 5)
 df <- do.call(make_mcc, parms)
-```
 
-
-```r
+##---- check ----
 if (TRUE){
   head(df, 10)
   # raw OR
@@ -100,36 +78,9 @@ if (TRUE){
     geom_density(alpha = .2) +
     facet_grid(vars(cc))
 }
-```
-- We can look at the contingency table (control/case by unexposed/exposed)
 
-```r
-m
-```
 
-```
-##     exposed
-## case    0   1
-##    0 4500 500
-##    1  801 199
-```
-- Raw OR is 2.24
-- And the delay distribution is shifted for exposed cases
-
-```r
-p0
-```
-
-![](vignette_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
-
-- Model parameterization is either
-   - One categorical variable of exposure $E$ that combines $V$ and quantiles of $X$: "Unexposed", "Exposed and 1st quantile of x", "Exposed and 2nd... etc". So that $E$ has (1 + $k$ quantiles) categories.
-   $$logitP(Y=1) \sim \beta_0 + \beta_1 E$$
-   - One binary variable of exposure + one continuous variable for spacing + interaction term. Or $$logitP(Y=1) \sim \beta_0 + \beta_1 V + \beta_2 X + \beta_3 (V \times X)$$
-
-## Categorized $X$
-
-```r
+##---- quantiles ----
 {
   q <- quantile(df$x, probs = outlb)
   x <- ifelse(df$x %in% q[1]:q[2], df$x, NA)
@@ -151,25 +102,8 @@ p0
   }
 
 }
-```
-- odds ratio by category
 
-```r
-res
-```
-
-```
-##                 OR OR_lo OR_up
-## expoE_[14,22) 6.58  4.85  8.93
-## expoE_[22,26) 2.75  1.85  4.09
-## expoE_[26,30) 1.28  0.82  1.99
-## expoE_[30,36) 1.12  0.70  1.79
-## expoE_[36,55) 0.27  0.11  0.66
-```
-## Continuous $X$
-- partial-effect plot 
-
-```r
+##---- spline ----
 {
   # Fit conditional logistic regression with RCS and an interaction
   dd <- datadist(df)
@@ -202,7 +136,3 @@ res
     theme(legend.position = "none")
   p2
 }
-```
-
-![](vignette_files/figure-html/spline-1.png)<!-- -->
-
