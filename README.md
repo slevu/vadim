@@ -120,7 +120,7 @@ m
 p0
 ```
 
-![](.R/vignette_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](./R/vignette_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 - Model parameterization is either
    - One categorical variable of exposure $E$ that combines $V$ and quantiles of $X$: "Unexposed", "Exposed and 1st quantile of x", "Exposed and 2nd... etc". So that $E$ has (1 + $k$ quantiles) categories.
@@ -204,5 +204,5 @@ res
 }
 ```
 
-![](.R/vignette_files/figure-html/spline-1.png)<!-- -->
+![](./R/vignette_files/figure-html/spline-1.png)<!-- -->
 
