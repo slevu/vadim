@@ -15,7 +15,7 @@
 
 
 ##---- parms ----
-parms <- list(ncase = 1000, kctl = 5,
+parms <- list(ncase = 1000, kctl = 2,
               pn = 0.1, or = 2,
               mean_x_exp = 21,
               mean_x_unexp = 28)
@@ -79,11 +79,18 @@ if (TRUE){
     facet_grid(vars(cc))
 }
 
+##---- MAR intervals ----
+if (TRUE){
+  fmar <- 0.2 # prop missing at random
+  r <- sample(1:nrow(df), round(nrow(df) * fmar))
+  df[r, 'x'] <- NA
+}
 
 ##---- quantiles ----
 {
-  q <- quantile(df$x, probs = outlb)
-  x <- ifelse(df$x %in% q[1]:q[2], df$x, NA)
+  # discard interval outliers
+  q <- quantile(df$x, probs = outlb, na.rm = TRUE)
+  x <- with(df, ifelse(x > q[1] & x < q[2], x, NA))
   # categorize x
   nqt <- 5
   co <- quantile(x, probs = seq(0, 1, 1/nqt), na.rm = TRUE)
@@ -113,7 +120,7 @@ if (TRUE){
 
   ## explicit prediction
   {
-    bound <- quantile(df$x, probs = outlb) ## rm 1% extreme
+    bound <- round(quantile(df$x, probs = outlb, na.rm = TRUE)) ## rm 1% extreme
     xref <- parms$mean_x_unexp
     xs <- bound[1]:bound[2]
     a <- list(x = xs, b = 1)
