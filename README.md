@@ -120,7 +120,7 @@ m
 p0
 ```
 
-![](./R/vignette_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](vignette_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 - Model parameterization is either
    - One categorical variable of exposure $E$ that combines $V$ and quantiles of $X$: "Unexposed", "Exposed and 1st quantile of x", "Exposed and 2nd... etc". So that $E$ has (1 + $k$ quantiles) categories.
@@ -131,8 +131,9 @@ p0
 
 ```r
 {
-  q <- quantile(df$x, probs = outlb)
-  x <- ifelse(df$x %in% q[1]:q[2], df$x, NA)
+  # discard interval outliers
+  q <- quantile(df$x, probs = outlb, na.rm = TRUE)
+  x <- with(df, ifelse(x > q[1] & x < q[2], x, NA))
   # categorize x
   nqt <- 5
   co <- quantile(x, probs = seq(0, 1, 1/nqt), na.rm = TRUE)
@@ -160,11 +161,11 @@ res
 
 ```
 ##                 OR OR_lo OR_up
-## expoE_[14,22) 6.58  4.85  8.93
+## expoE_[15,22) 6.41  4.69  8.77
 ## expoE_[22,26) 2.75  1.85  4.09
-## expoE_[26,30) 1.28  0.82  1.99
-## expoE_[30,36) 1.12  0.70  1.79
-## expoE_[36,55) 0.27  0.11  0.66
+## expoE_[26,30) 1.27  0.82  1.97
+## expoE_[30,36) 1.10  0.69  1.76
+## expoE_[36,54) 0.27  0.11  0.66
 ```
 ## Continuous $X$
 - partial-effect plot 
@@ -179,7 +180,7 @@ res
 
   ## explicit prediction
   {
-    bound <- quantile(df$x, probs = outlb) ## rm 1% extreme
+    bound <- round(quantile(df$x, probs = outlb, na.rm = TRUE)) ## rm 1% extreme
     xref <- parms$mean_x_unexp
     xs <- bound[1]:bound[2]
     a <- list(x = xs, b = 1)
@@ -204,5 +205,7 @@ res
 }
 ```
 
-![](./R/vignette_files/figure-html/spline-1.png)<!-- -->
+![](vignette_files/figure-html/spline-1.png)<!-- -->
+
+
 

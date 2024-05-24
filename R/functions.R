@@ -15,7 +15,7 @@
 
 
 ##---- parms ----
-parms <- list(ncase = 1000, kctl = 2,
+parms <- list(ncase = 1000, kctl = 5,
               pn = 0.1, or = 2,
               mean_x_exp = 21,
               mean_x_unexp = 28)
