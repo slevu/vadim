@@ -2,6 +2,17 @@
 
 Code and simulated data for the manuscript **Influence of mRNA Covid-19 vaccine dosing interval on the risk of myocarditis** by Le Vu et al.
 
+## Requirements
+This script has been developed and tested with R version 4.2.1 on Windows 10 Entreprise.
+The following packages are needed to execute the functions: `install.packages(c("rstan", "StanHeaders", "Rcpp", "reshape2"))`.
+
+## Background
+
+- We are analyzing a matched case-control study with essentially two covariates, first $V$ the recent exposure to a vaccine dose (binary variable), and $X$ a continuous time interval that represents spacing between previous and current dose.
+    - While the recent exposure is a risk factor in itself, we state that the time interval only acts as a risk factor conditional on recent exposure.
+    - The hypothesis for the research question is that shorter spacing between doses increase the risk of being a case in people recently vaccinated (i.e. exposed).
+    - We will quantify the relation by either categorizing $X$ or modelling it continuously.
+
 
 ```r
 knitr::read_chunk("functions.R")
@@ -24,11 +35,6 @@ parms <- list(ncase = 1000, kctl = 5,
               mean_x_unexp = 28)
 outlb <-  c(0.01, .99)
 ```
-
-- We are analyzing a matched case-control study with essentially two covariates, first $V$ the recent exposure to a vaccine dose (binary variable), and $X$ a continuous time interval that represents spacing between previous and current dose.
-    - While the recent exposure is a risk factor in itself, we state that the time interval only acts as a risk factor conditional on recent exposure.
-    - The hypothesis for the research question is that shorter spacing between doses increase the risk of being a case in people recently vaccinated (i.e. exposed).
-    - We will quantify the relation by either categorizing $X$ or modelling it continuously.
  
 ## Data   
 - We start by simulating data from a matched case-control study. Parameters are set so that
@@ -206,6 +212,4 @@ res
 ```
 
 ![](vignette_files/figure-html/spline-1.png)<!-- -->
-
-
 
